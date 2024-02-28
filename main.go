@@ -40,7 +40,6 @@ func init() {
 
 func main() {
 	flagPort := flag.Int("port", 8080, "port to listen on")
-	flagChannel := flag.String("channel", "", "Slack channel")
 	flagQPH := flag.Int("qph", 10, "max queries per HOUR to OpenAI")
 	flagMinPriority := flag.String("min-priority", "warning", "minimum priority to analyse")
 	flagGPTModel := flag.String("model", "gpt-3.5-turbo", "Backend AI model")
@@ -49,8 +48,8 @@ func main() {
 	flag.Parse()
 
 	minPriority = *flagMinPriority
-
-	if *flagChannel == "" {
+	flagChannel := os.Getenv("SLACK_CHANNEL")
+	if flagChannel == "" {
 		log.Fatal("Please specify slack channel")
 	}
 
@@ -58,7 +57,7 @@ func main() {
 	if slackToken == "" {
 		log.Fatal("SLACK_TOKEN is not set")
 	}
-	slackClient, _ = slack.NewClient(*flagChannel, slackToken)
+	slackClient, _ = slack.NewClient(flagChannel, slackToken)
 
 	openaiToken := os.Getenv("OPENAI_TOKEN")
 	if openaiToken == "" {
